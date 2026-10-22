@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareerNex | Step-by-Step Skill Gap Analyzer</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <h1>CareerNex</h1>
+        <p>Step-by-Step Resume Analysis & Gap Identification</p>
+      </div>
+
+      <div class="user-controls">
+        <div class="role-selector">
+          <label for="globalRoleSelect">Target Role:</label>
+          <select id="globalRoleSelect">
+            <optgroup label="Technical Roles">
+              <option value="BACKEND" selected>Java Backend Developer</option>
+              <option value="FRONTEND_DEV">Frontend Developer</option>
+              <option value="FULLSTACK_DEV">Full Stack Developer (MERN)</option>
+          </select>
+        </div>
+
+        <!-- <div class="profile-info">
+          <strong>Abhishek Anthwal</strong>
+          <span>MCA | Roll: 1103357</span>
+        </div> -->
+      </div>
+    </header>
+
+    <!-- STEP NAVIGATION (STRICTLY LOCKED) -->
+    <nav class="step-nav">
+      <button class="step-btn active" id="btnStep1" data-tab="tab-step1">
+        1. Upload Resume
+      </button>
+      <button class="step-btn disabled" id="btnStep2" data-tab="tab-step2" disabled>
+        2. Skill Quiz <i class="fa-solid fa-lock lock-icn"></i>
+      </button>
+      <button class="step-btn disabled" id="btnStep3" data-tab="tab-step3" disabled>
+        3. Skill Gap Report <i class="fa-solid fa-lock lock-icn"></i>
+      </button>
+      <button class="step-btn disabled" id="btnStep4" data-tab="tab-step4" disabled>
+        4. Learning Roadmap <i class="fa-solid fa-lock lock-icn"></i>
+      </button>
+    </nav>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="workspace">
+
+      <!-- STEP 1: RESUME UPLOAD & EXPLICIT FETCH -->
+      <section id="tab-step1" class="tab-pane active">
+        <div class="panel">
+          <h2>Step 1: Upload Resume & Fetch Skills</h2>
+          <p class="desc">Select your PDF resume or paste plain text, then click the <strong>Fetch & Extract
+              Skills</strong> button to proceed.</p>
+
+          <div class="dropzone" id="dropzone">
+            <i class="fa-solid fa-file-pdf icon"></i>
+            <h3>Click or Drag & Drop PDF Resume</h3>
+            <p>Supported file format: PDF, DOCX</p>
+            <input type="file" id="resumeFileInput" accept=".pdf,.txt,application/pdf,text/plain" hidden>
+            <button class="btn btn-secondary" onclick="document.getElementById('resumeFileInput').click()">Select
+              File</button>
+            <div id="selectedFileBadge" class="selected-file-badge hidden" style="margin-top: 10px;">
+              <i class="fa-solid fa-file-lines"></i> <span id="fileNameDisplay">no_file.pdf</span>
+            </div>
+          </div>
+
+          <!-- DEDICATED FETCH BUTTON FOR UPLOADED FILE -->
+          <div style="margin-top: 1rem; text-align: center;">
+            <button class="btn btn-primary btn-large" id="fetchResumeFileBtn" disabled>
+              <i class="fa-solid fa-cloud-arrow-down"></i> Fetch & Extract Skills from Selected Resume
+            </button>
+          </div>
+
+          <div id="uploadStatus" class="alert alert-success hidden" style="margin-top: 1.5rem;">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <strong>Resume Parsed Successfully!</strong>
+              <div>Skills extracted and matched against target role requirements.</div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem;">
+            <label>Or Paste Plain Resume Content:</label>
+            <textarea id="rawResumeText" rows="4"
+              placeholder="Paste your resume content here (e.g., Java, Spring Boot, MySQL, REST APIs, Git)..."></textarea>
+            <button class="btn btn-secondary" id="parseTextBtn" style="margin-top: 0.5rem;">
+              <i class="fa-solid fa-terminal"></i> Fetch Skills from Text Buffer
+            </button>
+          </div>
+
+          <!-- FETCHED SKILLS & GAP SUMMARY -->
+          <div id="parsedResultSection" class="hidden"
+            style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #dcdfe6;">
+            <h3>Extraction & Match Summary</h3>
+
+            <div class="match-grid">
+              <div>
+                <h4 class="text-success"><i class="fa-solid fa-check"></i> Found in Resume:</h4>
+                <div class="tag-cloud" id="foundSkillsTags"></div>
+              </div>
+
+              <div>
+                <h4 class="text-danger"><i class="fa-solid fa-xmark"></i> Missing / Skill Gaps Identified:</h4>
+                <div class="tag-cloud" id="missingGapsTags"></div>
+              </div>
+            </div>
+
+            <div style="margin-top: 2rem; text-align: right;">
+              <button class="btn btn-success" id="unlockStep2Btn">Unlock & Proceed to Step 2 (Quiz) &rarr;</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STEP 2: QUIZ -->
+      <section id="tab-step2" class="tab-pane">
+        <div class="panel">
+          <h2>Step 2: Resume Reality Check Quiz</h2>
+          <p class="desc" id="quizRoleSubtitle">Targeted non-repeating questions based on skills extracted from your
+            resume.</p>
+
+          <div class="quiz-header">
+            <span id="quizCounter">Question 1 of 5</span>
+            <span class="skill-pill" id="currentQuestionSkill">Java</span>
+          </div>
+
+          <div id="quizContainer" class="quiz-card">
+            <!-- Dynamic Questions Injected Here -->
+          </div>
+
+          <div class="quiz-footer">
+            <button class="btn btn-secondary" id="prevQuestionBtn" disabled>&larr; Previous</button>
+            <button class="btn btn-primary" id="nextQuestionBtn">Next Question &rarr;</button>
+            <button class="btn btn-success hidden" id="submitQuizBtn">Submit Quiz & Calculate Gaps</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3: GAP REPORT -->
+      <section id="tab-step3" class="tab-pane">
+        <div class="grid-2">
+          <div class="panel text-center">
+            <h2>Career Readiness Score</h2>
+
+            <div class="score-circle">
+              <span id="readinessScoreVal">0%</span>
+            </div>
+
+            <div id="readinessStatusBadge" class="badge badge-warning">Needs Improvement</div>
+
+            <p class="desc" id="readinessSummaryText" style="margin-top: 1rem;">
+              Calculated based on verified resume skills vs target role requirements.
+            </p>
+
+            <div class="formula-box">
+              <strong>Scoring Rule:</strong><br>
+              <code>Score = (Verified Skills / Target Role Requirements) * 100</code>
+              <div id="formulaBreakdown" style="margin-top: 0.3rem; color: #555;">Calculation: (0 / 5) * 100 = 0%</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Final Skill Gap Analysis</h2>
+
+            <h4 class="text-success"><i class="fa-solid fa-check"></i> Verified Competencies</h4>
+            <div class="tag-cloud" id="finalVerifiedTags"></div>
+
+            <h4 class="text-danger" style="margin-top: 1.5rem;"><i class="fa-solid fa-xmark"></i> Verified Skill Gaps
+            </h4>
+            <div class="tag-cloud" id="finalGapTags"></div>
+
+            <div style="margin-top: 2rem; text-align: right;">
+              <button class="btn btn-primary" id="unlockStep4Btn">Proceed to Step 4 (Roadmap) &rarr;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: ROADMAP -->
+      <section id="tab-step4" class="tab-pane">
+        <div class="panel">
+          <h2>Step 4: Targeted Learning Plan</h2>
+          <p class="desc">Projects and daily timeline curated specifically to close your identified skill gaps.</p>
+
+          <h3 style="margin-bottom: 1rem;">Recommended Projects</h3>
+          <div class="project-list" id="projectRecommendationsGrid">
+            <!-- Dynamic Projects -->
+          </div>
+
+          <h3 style="margin-top: 2rem; margin-bottom: 1rem;">14-Day Daily Learning Plan</h3>
+          <div class="roadmap-timeline" id="roadmapTimelineContainer">
+            <!-- Dynamic Timeline -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>CareerNex — PBL Project</p>
+    </footer>
+
+  </div>
+
+  <!-- PDF JS Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  </script>
+
+  <!-- Logic JS -->
+  <script src="script.js"></script>
+</body>
+
+</html>
