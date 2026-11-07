@@ -13,7 +13,85 @@
 
 <body>
 
-  <div class="container">
+  <!-- AUTHENTICATION SCREEN -->
+  <div class="container" id="authScreen">
+
+    <div class="panel" style="max-width: 450px; margin: 80px auto;">
+
+      <h2 style="text-align: center;">Welcome to CareerNex</h2>
+      <p class="desc text-center">
+        Login or create an account to analyze your resume.
+      </p>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm">
+
+        <h3>Login</h3>
+
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Login
+        </button>
+
+        <p style="text-align: center; margin-top: 1rem;">
+          Don't have an account?
+          <button type="button" id="showRegisterBtn" class="btn btn-secondary">
+            Register
+          </button>
+        </p>
+
+      </form>
+
+      <!-- REGISTRATION FORM -->
+      <form id="registerForm" class="hidden">
+
+        <h3>Create Account</h3>
+
+        <div class="form-group">
+          <label for="registerFullName">Full Name</label>
+          <input type="text" id="registerFullName" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="registerEmail">Email Address</label>
+          <input type="email" id="registerEmail" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" placeholder="Create a password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Create Account
+        </button>
+
+        <p style="text-align: center; margin-top: 1rem;">
+          Already have an account?
+          <button type="button" id="showLoginBtn" class="btn btn-secondary">
+            Login
+          </button>
+        </p>
+
+      </form>
+
+      <div id="authStatus" class="alert hidden" style="margin-top: 1rem;"></div>
+
+    </div>
+
+  </div>
+
+  <!-- Main Dashboard -->
+  <div class="container hidden" id="mainApp">
 
     <!-- HEADER -->
     <header class="header">
@@ -27,9 +105,10 @@
           <label for="globalRoleSelect">Target Role:</label>
           <select id="globalRoleSelect">
             <optgroup label="Technical Roles">
-              <option value="BACKEND" selected>Java Backend Developer</option>
-              <option value="FRONTEND_DEV">Frontend Developer</option>
-              <option value="FULLSTACK_DEV">Full Stack Developer (MERN)</option>
+              <option value="JAVA_BACKEND" selected>Java Backend Developer</option>
+              <option value="FRONTEND">Frontend Developer</option>
+              <option value="FULL_STACK">Full Stack Developer</option>
+            </optgroup>
           </select>
         </div>
 
@@ -69,8 +148,8 @@
           <div class="dropzone" id="dropzone">
             <i class="fa-solid fa-file-pdf icon"></i>
             <h3>Click or Drag & Drop PDF Resume</h3>
-            <p>Supported file format: PDF, DOCX</p>
-            <input type="file" id="resumeFileInput" accept=".pdf,.txt,application/pdf,text/plain" hidden>
+            <p>Supported file format: PDF</p>
+            <input type="file" id="resumeFileInput" accept=".pdf,application/pdf" hidden>
             <button class="btn btn-secondary" onclick="document.getElementById('resumeFileInput').click()">Select
               File</button>
             <div id="selectedFileBadge" class="selected-file-badge hidden" style="margin-top: 10px;">
@@ -91,15 +170,6 @@
               <strong>Resume Parsed Successfully!</strong>
               <div>Skills extracted and matched against target role requirements.</div>
             </div>
-          </div>
-
-          <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem;">
-            <label>Or Paste Plain Resume Content:</label>
-            <textarea id="rawResumeText" rows="4"
-              placeholder="Paste your resume content here (e.g., Java, Spring Boot, MySQL, REST APIs, Git)..."></textarea>
-            <button class="btn btn-secondary" id="parseTextBtn" style="margin-top: 0.5rem;">
-              <i class="fa-solid fa-terminal"></i> Fetch Skills from Text Buffer
-            </button>
           </div>
 
           <!-- FETCHED SKILLS & GAP SUMMARY -->
@@ -218,14 +288,20 @@
 
   </div>
 
-  <!-- PDF JS Libraries -->
+  <!-- PDF libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
   </script>
 
-  <!-- Logic JS -->
+  <!-- CareerNex JS files -->
+  <script src="js/api.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/resume.js"></script>
+
+  <!-- Existing application logic -->
   <script src="script.js"></script>
 </body>
 

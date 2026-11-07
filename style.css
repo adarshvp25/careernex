@@ -468,3 +468,98 @@ textarea {
   border-top: 1px solid #dcdfe6;
   margin-top: 20px;
 }
+
+
+
+/* =================================
+   AUTHENTICATION SCREEN
+================================= */
+
+#authScreen {
+  min-height: calc(100vh - 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 15px;
+}
+
+#authScreen .panel {
+  width: 100%;
+  max-width: 450px;
+  padding: 35px;
+  margin: 0;
+  box-shadow: 0 4px 18px rgba(44, 62, 80, 0.08);
+}
+
+#authScreen h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+#authScreen h3 {
+  font-size: 17px;
+  margin-bottom: 20px;
+  color: #1a252f;
+}
+
+#authScreen .desc {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+#authScreen .form-group {
+  margin-bottom: 18px;
+}
+
+#authScreen .form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #495057;
+}
+
+#authScreen input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#authScreen input:focus {
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+}
+
+#authScreen .btn {
+  padding: 11px 16px;
+}
+
+#authScreen .btn-secondary {
+  margin-left: 5px;
+}
+
+#authStatus {
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Authentication responsive layout */
+@media (max-width: 480px) {
+  #authScreen .panel {
+    padding: 25px 20px;
+  }
+
+  #authScreen h2 {
+    font-size: 21px;
+  }
+}

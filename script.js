@@ -1,207 +1,3 @@
-
-const AppState = {
-  currentCompletedStep: 1, // Only Step 1 unlocked initially
-  targetRole: "JAVA_BACKEND",
-  extractedSkills: [],
-  verifiedSkills: [],
-  skillGaps: [],
-  quizAnswers: {},
-  currentQuizQuestions: [],
-  currentQuizIndex: 0,
-  readinessScore: 0,
-
-  // ROLE PREREQUISITES
-  roles: {
-    JAVA_BACKEND: {
-      title: "Java Backend Developer",
-      requiredSkills: ["Java", "Spring Boot", "MySQL", "REST APIs", "Git"]
-    },
-    FRONTEND_DEV: {
-      title: "Frontend Developer",
-      requiredSkills: ["JavaScript", "HTML", "CSS", "React", "Git"]
-    },
-    FULLSTACK_DEV: {
-      title: "Full Stack Developer (MERN)",
-      requiredSkills: ["JavaScript", "React", "Node.js", "Express", "MySQL"]
-    }
-  },
-
-  // Role specific project catalogs
-  roleProjects: {
-    JAVA_BACKEND: [
-      {
-        id: 101,
-        title: "Enterprise Candidate Management REST API",
-        targetSkills: ["Spring Boot", "REST APIs", "MySQL"],
-        description: "Build scalable CRUD REST endpoints using Spring Boot, JPA Hibernate, and MySQL."
-      },
-      {
-        id: 102,
-        title: "Git Version Control Workflow & CI Automation",
-        targetSkills: ["Git", "Java"],
-        description: "Set up multi-branch Git workflow and automated testing suite for Java applications."
-      }
-    ],
-
-    FRONTEND_DEV: [
-      {
-        id: 201,
-        title: "Interactive E-Commerce Product Dashboard",
-        targetSkills: ["React", "JavaScript", "CSS"],
-        description: "Build a responsive React web app with state management, custom CSS, and cart logic."
-      },
-      {
-        id: 202,
-        title: "Responsive Semantic Landing Page",
-        targetSkills: ["HTML", "CSS", "Git"],
-        description: "Create mobile-first accessible HTML5/CSS3 landing page and deploy via GitHub Pages."
-      }
-    ],
-
-    FULLSTACK_DEV: [
-      {
-        id: 301,
-        title: "MERN Stack Hospital Resource & Bed Tracker",
-        targetSkills: ["React", "Node.js", "Express", "MySQL"],
-        description: "Develop end-to-end full stack web app with JWT authentication and relational storage."
-      }
-    ]
-  },
-
-  // Role specific quiz questions
-  roleQuestionPool: {
-    JAVA_BACKEND: [
-      {
-        id: 101,
-        skill: "Java",
-        question: "Which keyword is used to inherit a class in Java?",
-        options: ["implements", "extends", "inherits", "super"],
-        correct: 1
-      },
-      {
-        id: 102,
-        skill: "Spring Boot",
-        question: "Which annotation marks a REST controller in Spring Boot?",
-        options: ["@Entity", "@RestController", "@Table", "@BeanOnly"],
-        correct: 1
-      },
-      {
-        id: 103,
-        skill: "MySQL",
-        question: "Which SQL command retrieves data?",
-        options: ["GET", "SELECT", "OPEN", "FETCH"],
-        correct: 1
-      },
-      {
-        id: 104,
-        skill: "REST APIs",
-        question: "Which HTTP method commonly retrieves a resource?",
-        options: ["POST", "GET", "DELETE", "PATCH"],
-        correct: 1
-      },
-      {
-        id: 105,
-        skill: "Git",
-        question: "Which command creates a commit?",
-        options: ["git push", "git status", "git commit", "git fetch"],
-        correct: 2
-      }
-    ],
-
-    FRONTEND_DEV: [
-      {
-        id: 201,
-        skill: "JavaScript",
-        question: "Which method converts a JSON string into a JavaScript object?",
-        options: ["JSON.stringify()", "JSON.parse()", "Object.parse()", "JSON.toObject()"],
-        correct: 1
-      },
-      {
-        id: 202,
-        skill: "HTML",
-        question: "Which HTML5 element is used for standalone self-contained content?",
-        options: ["<section>", "<article>", "<aside>", "<div>"],
-        correct: 1
-      },
-      {
-        id: 203,
-        skill: "CSS",
-        question: "Which CSS Flexbox property aligns items along the main axis?",
-        options: ["align-items", "justify-content", "align-content", "flex-direction"],
-        correct: 1
-      },
-      {
-        id: 204,
-        skill: "React",
-        question: "Which React Hook is used to manage side effects in functional components?",
-        options: ["useState", "useContext", "useEffect", "useReducer"],
-        correct: 2
-      },
-      {
-        id: 205,
-        skill: "Git",
-        question: "Which command creates and switches to a new branch simultaneously?",
-        options: [
-          "git branch <name>",
-          "git checkout -b <name>",
-          "git switch-create <name>",
-          "git merge <name>"
-        ],
-        correct: 1
-      }
-    ],
-
-    FULLSTACK_DEV: [
-      {
-        id: 301,
-        skill: "JavaScript",
-        question: "Which keyword declares a block-scoped variable that can be reassigned?",
-        options: ["const", "let", "static", "final"],
-        correct: 1
-      },
-      {
-        id: 302,
-        skill: "React",
-        question: "Which Hook manages component state?",
-        options: ["useEffect", "useState", "useMemo", "useRef"],
-        correct: 1
-      },
-      {
-        id: 303,
-        skill: "Node.js",
-        question: "What is Node.js primarily used for?",
-        options: [
-          "Running JavaScript outside the browser",
-          "Styling HTML",
-          "Managing CSS",
-          "Creating SQL tables only"
-        ],
-        correct: 0
-      },
-      {
-        id: 304,
-        skill: "Express",
-        question: "What is Express.js?",
-        options: [
-          "A database",
-          "A CSS framework",
-          "A web framework for Node.js",
-          "A programming language"
-        ],
-        correct: 2
-      },
-      {
-        id: 305,
-        skill: "MySQL",
-        question: "Which clause filters rows in an SQL query?",
-        options: ["ORDER BY", "WHERE", "GROUP BY", "JOIN"],
-        correct: 1
-      }
-    ]
-  }
-};
-
-
 document.addEventListener("DOMContentLoaded", () => {
   initStepNavigation();
   initRoleSelector();
@@ -308,10 +104,8 @@ function initResumeUpload() {
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("resumeFileInput");
   const fetchFileBtn = document.getElementById("fetchResumeFileBtn");
-  const parseTextBtn = document.getElementById("parseTextBtn");
   const unlockStep2Btn = document.getElementById("unlockStep2Btn");
 
-  const rawResumeInput = document.getElementById("rawResumeText");
   const statusBanner = document.getElementById("uploadStatus");
 
   if (dropzone && fileInput) {
@@ -339,11 +133,17 @@ function initResumeUpload() {
       const isPdf =
         file.type === "application/pdf" || /\.pdf$/i.test(file.name);
 
-      const isTxt =
-        file.type === "text/plain" || /\.txt$/i.test(file.name);
+      if (!isPdf) {
+        alert("Please select a PDF resume.");
+        fileInput.value = "";
+        if (fetchFileBtn) fetchFileBtn.disabled = true;
+        if (selectedBadge) selectedBadge.classList.add("hidden");
+        return;
+      }
 
-      if (!isPdf && !isTxt) {
-        alert("Unsupported file type. Please select a PDF or TXT resume.");
+      // Backend allows a maximum file size of 5 MB.
+      if (file.size > 5 * 1024 * 1024) {
+        alert("The resume file must be 5 MB or smaller.");
         fileInput.value = "";
         if (fetchFileBtn) fetchFileBtn.disabled = true;
         if (selectedBadge) selectedBadge.classList.add("hidden");
@@ -376,80 +176,62 @@ function initResumeUpload() {
       e.preventDefault();
 
       const file = fileInput?.files?.[0];
-      const pastedText = rawResumeInput?.value.trim() || "";
 
-      try {
-        let resumeText = pastedText;
-
-        // Pasted text takes priority. Otherwise, read the selected file.
-        if (!resumeText && file) {
-          const isPdf =
-            file.type === "application/pdf" || /\.pdf$/i.test(file.name);
-
-          const isTxt =
-            file.type === "text/plain" || /\.txt$/i.test(file.name);
-
-          if (isPdf) {
-            resumeText = await extractPdfText(file);
-          } else if (isTxt) {
-            resumeText = await file.text();
-          } else {
-            throw new Error("Please select a valid PDF or TXT resume.");
-          }
-
-          resumeText = resumeText.trim();
-        }
-
-        if (!resumeText) {
-          alert("Please select a PDF/TXT resume or paste your resume text.");
-          return;
-        }
-
-        if (statusBanner) {
-          statusBanner.classList.remove("hidden");
-          statusBanner.textContent = "Resume processed. Analyzing skills...";
-        }
-
-        simulateResumeParse(resumeText);
-
-        if (statusBanner) {
-          statusBanner.textContent = "Resume text extracted successfully.";
-        }
-      } catch (error) {
-        console.error("Resume extraction error:", error);
-
-        if (statusBanner) {
-          statusBanner.classList.remove("hidden");
-          statusBanner.textContent =
-            error.message || "Could not process the resume.";
-        }
-
-        alert(error.message || "Could not process the resume.");
-      }
-    };
-  }
-
-  // Parse text entered manually.
-  if (parseTextBtn) {
-    parseTextBtn.onclick = (e) => {
-      e.preventDefault();
-
-      const text = rawResumeInput?.value.trim();
-
-      if (!text) {
-        alert("Please paste your resume text first.");
+      if (!file) {
+        alert("Please select a PDF resume first.");
         return;
       }
 
-      if (statusBanner) {
-        statusBanner.classList.remove("hidden");
-        statusBanner.textContent = "Analyzing pasted resume text...";
-      }
+      const statusBanner = document.getElementById("uploadStatus");
 
-      simulateResumeParse(text);
+      try {
+        fetchFileBtn.disabled = true;
 
-      if (statusBanner) {
-        statusBanner.textContent = "Resume text analyzed successfully.";
+        if (statusBanner) {
+          statusBanner.classList.remove("hidden");
+          statusBanner.textContent = "Uploading resume to CareerNex...";
+        }
+
+        // Upload PDF to Spring Boot backend
+        const result = await uploadResume(file);
+
+        // Store the database resume ID
+        AppState.resumeId = result.id;
+
+        if (statusBanner) {
+          statusBanner.textContent = "Resume uploaded successfully. Extracting skills...";
+        }
+
+        // Retrieve skills detected by the backend
+        const skillsResult = await getResumeSkills(result.id);
+
+        AppState.extractedSkills = skillsResult.detectedSkills;
+
+        // Display skill matches against selected role
+        matchResumeToRole();
+
+        const parsedSection = document.getElementById("parsedResultSection");
+
+        if (parsedSection) {
+          parsedSection.classList.remove("hidden");
+        }
+
+        if (statusBanner) {
+          statusBanner.textContent = "Resume uploaded and skills extracted successfully!";
+        }
+
+      } catch (error) {
+        console.error("Resume upload error:", error);
+
+        if (statusBanner) {
+          statusBanner.classList.remove("hidden");
+          statusBanner.textContent = error.message || "Resume upload failed.";
+        }
+
+        alert(error.message || "Resume upload failed.");
+
+      } finally {
+        fetchFileBtn.disabled = false;
       }
     };
   }
@@ -467,25 +249,6 @@ function initResumeUpload() {
   }
 }
 
-
-function simulateResumeParse(text) {
-  const knownKeywords = [
-    "Java", "Spring Boot", "MySQL", "REST APIs", "HTML", "CSS", "JavaScript", "React", "Git",
-    "Linux", "Docker", "Python", "AWS", "SQL", "Agile/Scrum", "SEO", "User Research", "Wireframing", "Excel"
-  ];
-
-  const found = knownKeywords.filter(kw => text.toLowerCase().includes(kw.toLowerCase()));
-
-  AppState.extractedSkills = Array.from(new Set(found));
-  if (AppState.extractedSkills.length === 0) {
-    alert("No recognized skills were found in the resume text.");
-  }
-
-  matchResumeToRole();
-
-  const parsedSection = document.getElementById("parsedResultSection");
-  if (parsedSection) parsedSection.classList.remove("hidden");
-}
 
 function matchResumeToRole() {
   const currentRoleObj = AppState.roles[AppState.targetRole] || AppState.roles["JAVA_BACKEND"];
