@@ -31,6 +31,22 @@ function initStepNavigation() {
       }
     });
   });
+
+  // Navigate to Step 3 from quiz results
+  const viewSkillGapBtn = document.getElementById("viewSkillGapBtn");
+
+  if (viewSkillGapBtn) {
+    viewSkillGapBtn.addEventListener("click", () => {
+
+      const step3Button = Array.from(stepBtns).find(
+        btn => btn.getAttribute("data-tab") === "tab-step3"
+      );
+
+      if (step3Button) {
+        step3Button.click();
+      }
+    });
+  }
 }
 
 function unlockStep(stepNumber, btnId) {
@@ -238,13 +254,24 @@ function initResumeUpload() {
 
   // Keep your existing Step 2 unlock behavior.
   if (unlockStep2Btn) {
-    unlockStep2Btn.onclick = () => {
-      unlockStep(2, "btnStep2");
-      prepareRoleQuiz();
-      renderQuizQuestion();
+    unlockStep2Btn.onclick = async () => {
+      try {
+        unlockStep2Btn.disabled = true;
 
-      const step2Btn = document.getElementById("btnStep2");
-      if (step2Btn) step2Btn.click();
+        unlockStep(2, "btnStep2");
+
+        await prepareRoleQuiz();
+        renderQuizQuestion();
+
+        const step2Btn = document.getElementById("btnStep2");
+        if (step2Btn) step2Btn.click();
+
+      } catch (error) {
+        console.error("Quiz loading error:", error);
+        alert(error.message || "Unable to load quiz questions.");
+      } finally {
+        unlockStep2Btn.disabled = false;
+      }
     };
   }
 }
@@ -275,15 +302,6 @@ function matchResumeToRole() {
 }
 
 // Quiz
-function prepareRoleQuiz() {
-  let pool = AppState.roleQuestionPool[AppState.targetRole] || AppState.roleQuestionPool["JAVA_BACKEND"];
-  let shuffled = [...pool].sort(() => 0.5 - Math.random());
-
-  AppState.currentQuizQuestions = shuffled.slice(0, 5);
-  AppState.quizAnswers = {};
-  AppState.currentQuizIndex = 0;
-}
-
 function renderQuizQuestion() {
   const qContainer = document.getElementById("quizContainer");
   if (!qContainer) return;
@@ -305,7 +323,7 @@ function renderQuizQuestion() {
   const currentSkillPill = document.getElementById("currentQuestionSkill");
 
   if (quizCounter) quizCounter.innerText = `Question ${AppState.currentQuizIndex + 1} of ${total}`;
-  if (currentSkillPill) currentSkillPill.innerText = q.skill;
+  if (currentSkillPill) currentSkillPill.innerText = q.skill || "General";
 
   let optionsHTML = q.options.map((opt, idx) => `
     <div class="option-row ${AppState.quizAnswers[q.id] === idx ? 'selected' : ''}" onclick="selectQuizOption(${q.id}, ${idx})">
@@ -358,7 +376,7 @@ function selectQuizOption(questionId, optionIdx) {
   renderQuizQuestion();
 }
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
   const target = e.target.closest("button");
   if (!target) return;
   if (target.id === "nextQuestionBtn") {
@@ -386,28 +404,210 @@ document.addEventListener("click", (e) => {
   if (target.id === "submitQuizBtn") {
     const questions = AppState.currentQuizQuestions;
 
-    const unanswered = questions.filter(q => AppState.quizAnswers[q.id] === undefined);
+    // Check whether every question has been answered
+    const unanswered = questions.filter(
+      q => AppState.quizAnswers[q.id] === undefined
+    );
+
     if (unanswered.length > 0) {
       alert(`Please answer all ${questions.length} questions before submitting!`);
       return;
     }
 
-    AppState.verifiedSkills = [];
+    try {
+      const submitBtn = document.getElementById("submitQuizBtn");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
 
-    questions.forEach(q => {
-      const selectedOption = AppState.quizAnswers[q.id];
-      if (selectedOption === q.correct) {
-        if (!AppState.verifiedSkills.includes(q.skill)) {
-          AppState.verifiedSkills.push(q.skill);
+      // Convert selected option indexes into A, B, C, or D
+      const answers = questions.map(q => ({
+        questionId: q.id,
+        selectedOption: String.fromCharCode(
+          65 + AppState.quizAnswers[q.id]
+        )
+      }));
+
+      // Submit answers to the backend
+      const result = await submitQuizAnswers(
+        getSelectedRoleId(),
+        answers
+      );
+
+      AppState.assessmentId = result.assessmentId;
+
+      // Identify skills verified by correct answers
+      AppState.verifiedSkills = [
+        ...new Set(
+          result.results
+            .filter(answer => answer.correct)
+            .map(answer => answer.skillName)
+            .filter(Boolean)
+        )
+      ];
+
+
+      // Calculate performance for each assessed skill
+      const skillStats = {};
+
+      result.results.forEach(answer => {
+        const skill = answer.skillName;
+
+        if (!skill) return;
+
+        if (!skillStats[skill]) {
+          skillStats[skill] = {
+            total: 0,
+            correct: 0
+          };
         }
-      }
-    });
 
-    calculateFinalReadiness();
-    unlockStep(3, "btnStep3");
-    alert("Quiz submitted! Your readiness score and skill gap breakdown have been updated.");
-    const step3Btn = document.getElementById("btnStep3");
-    if (step3Btn) step3Btn.click();
+        skillStats[skill].total++;
+
+        if (answer.correct) {
+          skillStats[skill].correct++;
+        }
+      });
+
+      // Display skill-wise assessment
+      const skillBreakdown = document.getElementById("skillBreakdown");
+
+      skillBreakdown.innerHTML = Object.entries(skillStats)
+        .map(([skill, stats]) => {
+          const percentage = Math.round(
+            (stats.correct / stats.total) * 100
+          );
+
+          let status;
+
+          if (stats.total < 3) {
+            status = "Limited data";
+          } else if (percentage >= 70) {
+            status = "Strong";
+          } else {
+            status = "Needs improvement";
+          }
+
+          return `
+            <div class="skill-breakdown-item">
+                <div class="skill-breakdown-header">
+                    <strong>${skill}</strong>
+                    <span>${stats.correct}/${stats.total} correct</span>
+                </div>
+
+                <div class="skill-progress-track">
+                    <div class="skill-progress-fill"
+                         style="width: ${percentage}%">
+                    </div>
+                </div>
+
+                <div class="skill-breakdown-footer">
+                    <span>${percentage}%</span>
+                    <span>${status}</span>
+                </div>
+            </div>
+        `;
+        })
+        .join("");
+
+      calculateFinalReadiness();
+      unlockStep(3, "btnStep3");
+
+      // Display quiz results
+      const resultsContainer = document.getElementById("quizResults");
+
+      document.getElementById("quizScore").textContent =
+        `${result.scorePercentage}%`;
+
+      document.getElementById("correctAnswers").textContent =
+        `${result.correctAnswers}/${result.totalQuestions}`;
+
+      document.getElementById("verifiedSkillsCount").textContent =
+        AppState.verifiedSkills.length;
+
+      // Display verified skills
+      document.getElementById("verifiedSkillsList").innerHTML =
+        AppState.verifiedSkills.length > 0
+          ? AppState.verifiedSkills.map(skill =>
+            `<span class="skill-tag">${skill}</span>`
+          ).join("")
+          : "<p>No skills verified.</p>";
+
+      // Display answer review with actual option text
+      document.getElementById("quizAnswerReview").innerHTML =
+        result.results.map((answer, index) => {
+
+          const question = AppState.currentQuizQuestions.find(
+            q => q.id === answer.questionId
+          );
+
+          const selectedIndex = answer.selectedOption
+            ? answer.selectedOption.charCodeAt(0) - 65
+            : -1;
+
+          const correctIndex = answer.correctOption
+            ? answer.correctOption.charCodeAt(0) - 65
+            : -1;
+
+          const selectedText = selectedIndex >= 0
+            ? question.options[selectedIndex]
+            : "Not attempted";
+
+          const correctText = correctIndex >= 0
+            ? question.options[correctIndex]
+            : "Not available";
+
+          return `
+            <div class="quiz-review-item ${answer.correct ? "correct" : "incorrect"}">
+                <h4>Question ${index + 1}</h4>
+
+                <p>${answer.questionText}</p>
+
+                <p>
+                    <strong>Your Answer:</strong>
+                    ${selectedText}
+                </p>
+
+                <p>
+                    <strong>Correct Answer:</strong>
+                    ${correctText}
+                </p>
+
+                <p>
+                    <strong>Result:</strong>
+                    ${answer.correct ? "Correct" : "Incorrect"}
+                </p>
+
+                <p>
+                    <strong>Explanation:</strong>
+                    ${answer.explanation || "No explanation available."}
+                </p>
+            </div>
+        `;
+        }).join("");
+
+      resultsContainer.classList.remove("hidden");
+
+      // Fetch dashboard data from backend
+      const dashboardData = await getDashboardData(
+        AppState.resumeId,
+        getSelectedRoleId(),
+        AppState.assessmentId
+      );
+
+      renderDashboardData(dashboardData);
+
+    } catch (error) {
+      console.error("Quiz submission error:", error);
+      alert(error.message || "Quiz submission failed.");
+
+    } finally {
+      const submitBtn = document.getElementById("submitQuizBtn");
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit Quiz";
+      }
+    }
   }
 
   if (target.id === "unlockStep4Btn") {

@@ -219,6 +219,42 @@
             <button class="btn btn-success hidden" id="submitQuizBtn">Submit Quiz & Calculate Gaps</button>
           </div>
         </div>
+
+        <div id="quizResults" class="quiz-results hidden">
+          <h2>Quiz Results</h2>
+
+          <div class="quiz-result-summary">
+            <div>
+              <h3 id="quizScore">0%</h3>
+              <p>Quiz Score</p>
+            </div>
+
+            <div>
+              <h3 id="correctAnswers">0/0</h3>
+              <p>Correct Answers</p>
+            </div>
+
+            <div>
+              <h3 id="verifiedSkillsCount">0</h3>
+              <p>Verified Skills</p>
+            </div>
+          </div>
+
+          <h3>Skill-wise Assessment</h3>
+          <div id="skillBreakdown"></div>
+
+          <h3>Verified Skills</h3>
+          <div id="verifiedSkillsList"></div>
+
+          <h3>Question-wise Review</h3>
+          <div id="quizAnswerReview"></div>
+
+          <div class="quiz-navigation-action">
+            <button id="viewSkillGapBtn" class="btn btn-primary">
+              View Skill Gap Report →
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- STEP 3: GAP REPORT -->
@@ -250,9 +286,30 @@
             <h4 class="text-success"><i class="fa-solid fa-check"></i> Verified Competencies</h4>
             <div class="tag-cloud" id="finalVerifiedTags"></div>
 
-            <h4 class="text-danger" style="margin-top: 1.5rem;"><i class="fa-solid fa-xmark"></i> Verified Skill Gaps
-            </h4>
-            <div class="tag-cloud" id="finalGapTags"></div>
+            <!-- Skill Coverage -->
+            <div class="skill-coverage-section">
+              <div class="skill-coverage-header">
+                <h4>Skill Coverage</h4>
+                <strong id="skillCoverageCount">0 / 0</strong>
+              </div>
+
+              <div class="skill-coverage-track">
+                <div id="skillCoverageFill" class="skill-coverage-fill"></div>
+              </div>
+
+              <div class="skill-coverage-legend">
+                <span id="matchedSkillCount">0 matched</span>
+                <span id="missingSkillCount">0 missing</span>
+              </div>
+            </div>
+
+            <!-- Mandatory Skill Gaps -->
+            <h4 class="text-danger">Mandatory Skills to Learn</h4>
+            <div class="tag-cloud" id="mandatoryGapTags"></div>
+
+            <!-- Optional Skill Gaps -->
+            <h4 class="text-warning optional-skills-heading">Optional Skills to Learn</h4>
+            <div class="tag-cloud" id="optionalGapTags"></div>
 
             <div style="margin-top: 2rem; text-align: right;">
               <button class="btn btn-primary" id="unlockStep4Btn">Proceed to Step 4 (Roadmap) &rarr;</button>
@@ -300,6 +357,8 @@
   <script src="js/state.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/resume.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/dashboard.js"></script>
 
   <!-- Existing application logic -->
   <script src="script.js"></script>

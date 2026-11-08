@@ -2,6 +2,7 @@ const AppState = {
     currentCompletedStep: 1, // Only Step 1 unlocked initially
     targetRole: "JAVA_BACKEND",
     resumeId: null,
+    assessmentId: null,
     extractedSkills: [],
     verifiedSkills: [],
     skillGaps: [],

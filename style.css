@@ -346,7 +346,7 @@ textarea {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  border: 6px solid #2c3e50;
+  /* border: 6px solid #2c3e50; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -562,4 +562,337 @@ textarea {
   #authScreen h2 {
     font-size: 21px;
   }
+}
+
+
+/* Quiz Results */
+.quiz-results {
+  margin-top: 30px;
+  padding: 25px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.quiz-results h2 {
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.quiz-result-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.quiz-result-summary>div {
+  padding: 20px;
+  text-align: center;
+  background: #f3f6fa;
+  border-radius: 10px;
+}
+
+.quiz-result-summary h3 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: #2563eb;
+}
+
+.quiz-result-summary p {
+  margin: 0;
+  color: #64748b;
+}
+
+#verifiedSkillsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0 25px;
+}
+
+.quiz-review-item {
+  padding: 18px;
+  margin-bottom: 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.quiz-review-item h4 {
+  margin-top: 0;
+  color: #1f2937;
+}
+
+.quiz-review-item p {
+  margin: 8px 0;
+  color: #4b5563;
+}
+
+@media (max-width: 600px) {
+  .quiz-result-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Correct and Incorrect Quiz Answers */
+
+.quiz-review-item.correct {
+  border-left: 5px solid #16a34a;
+  background: #f0fdf4;
+}
+
+.quiz-review-item.incorrect {
+  border-left: 5px solid #dc2626;
+  background: #fef2f2;
+}
+
+.quiz-review-item.correct h4 {
+  color: #15803d;
+}
+
+.quiz-review-item.incorrect h4 {
+  color: #b91c1c;
+}
+
+/* Skill-wise Assessment Breakdown */
+
+.skill-breakdown-item {
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.skill-breakdown-header,
+.skill-breakdown-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.skill-breakdown-header {
+  margin-bottom: 12px;
+}
+
+.skill-breakdown-header strong {
+  color: #1f2937;
+}
+
+.skill-breakdown-header span,
+.skill-breakdown-footer {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.skill-progress-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  background: #e5e7eb;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.skill-progress-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 20px;
+  transition: width 0.3s ease;
+}
+
+.skill-breakdown-footer span:last-child {
+  font-weight: 600;
+}
+
+/* Skill Gap Report Tags */
+
+#finalVerifiedTags,
+#finalGapTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#finalVerifiedTags .skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#finalGapTags .skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* Career Readiness Progress Ring */
+
+.score-circle {
+  --score: 0;
+  --progress-color: #eab308;
+
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+
+  background: conic-gradient(var(--progress-color) calc(var(--score) * 1%),
+      #e9edf2 0);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 25px auto;
+  position: relative;
+
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  transition: background 0.5s ease;
+}
+
+/* Inner white circle */
+
+.score-circle::before {
+  content: "";
+  position: absolute;
+
+  width: 154px;
+  height: 154px;
+
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+/* Percentage text */
+
+.score-circle span {
+  position: relative;
+  z-index: 1;
+
+  font-size: 36px;
+  font-weight: 700;
+  color: #263b50;
+  letter-spacing: -1px;
+}
+
+
+/* Skill Coverage Section */
+
+.skill-coverage-section {
+  margin: 22px 0;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.skill-coverage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.skill-coverage-header h4 {
+  margin: 0;
+  color: #263b50;
+}
+
+.skill-coverage-header strong {
+  font-size: 18px;
+  color: #263b50;
+}
+
+.skill-coverage-track {
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.skill-coverage-fill {
+  width: 0%;
+  height: 100%;
+  background: #16a34a;
+  border-radius: 20px;
+  transition: width 0.5s ease;
+}
+
+.skill-coverage-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#matchedSkillCount {
+  color: #16a34a;
+}
+
+#missingSkillCount {
+  color: #dc2626;
+}
+
+/* Mandatory Skill Gap Tags */
+
+#mandatoryGapTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#mandatoryGapTags .skill-tag {
+  display: inline-flex;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Optional Skill Gap Tags */
+
+#optionalGapTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#optionalGapTags .skill-tag {
+  display: inline-flex;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.optional-skills-heading {
+  margin-top: 24px;
 }
