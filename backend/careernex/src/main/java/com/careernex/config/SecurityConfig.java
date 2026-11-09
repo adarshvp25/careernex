@@ -20,51 +20,32 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            CorsConfigurationSource corsConfigurationSource)
-            throws Exception {
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter,
+			CorsConfigurationSource corsConfigurationSource) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
+		http.csrf(csrf -> csrf.disable())
 
-            // Enable CORS
-            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+				// Enable CORS
+				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/test").permitAll()
-                .requestMatchers("/api/roles/**").permitAll()
-                .requestMatchers("/api/assessments/**").authenticated()
-                .requestMatchers("/api/resumes/**").authenticated()
-                .anyRequest().authenticated()
-            )
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/api/test").permitAll().requestMatchers("/api/roles/**").permitAll()
+						.requestMatchers("/api/assessments/**").authenticated().requestMatchers("/api/resumes/**")
+						.authenticated().anyRequest().authenticated())
 
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint((request, response, authException) ->
-                    response.sendError(
-                        HttpServletResponse.SC_UNAUTHORIZED,
-                        "Unauthorized"
-                    )
-                )
-            )
+				.exceptionHandling(exception -> exception.authenticationEntryPoint((request, response,
+						authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
 
-            .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+		return http.build();
+	}
 }

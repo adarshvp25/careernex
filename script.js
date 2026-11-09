@@ -1,7 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initStepNavigation();
   initRoleSelector();
   initResumeUpload();
+
+  await restoreDashboardSession();
 });
 
 // Navigation
@@ -11,6 +13,11 @@ function initStepNavigation() {
 
   stepBtns.forEach(btn => {
     btn.addEventListener("click", () => {
+
+      localStorage.setItem(
+        "careernex_active_tab",
+        btn.getAttribute("data-tab")
+      );
       if (btn.classList.contains("disabled")) {
         alert(
           "Action Locked: Please complete the current step first to unlock this section."
@@ -54,6 +61,9 @@ function unlockStep(stepNumber, btnId) {
     AppState.currentCompletedStep = stepNumber;
   }
 
+  // Persist unlocked workflow steps
+  saveAppState();
+
   const btn = document.getElementById(btnId);
   if (btn) {
     btn.classList.remove("disabled");
@@ -70,6 +80,9 @@ function initRoleSelector() {
 
   selector.addEventListener("change", (e) => {
     AppState.targetRole = e.target.value;
+
+    // Persist selected target role
+    saveAppState();
 
     if (AppState.extractedSkills.length > 0) {
       matchResumeToRole();
@@ -189,7 +202,11 @@ function initResumeUpload() {
   // Extract text from a selected PDF/TXT file or use pasted resume text.
   if (fetchFileBtn) {
     fetchFileBtn.onclick = async (e) => {
+
       e.preventDefault();
+      e.stopPropagation();
+
+      // e.preventDefault();
 
       const file = fileInput?.files?.[0];
 
@@ -213,6 +230,8 @@ function initResumeUpload() {
 
         // Store the database resume ID
         AppState.resumeId = result.id;
+
+        saveAppState();
 
         if (statusBanner) {
           statusBanner.textContent = "Resume uploaded successfully. Extracting skills...";
@@ -302,15 +321,16 @@ function matchResumeToRole() {
 }
 
 // Quiz
-function renderQuizQuestion() {
+async function renderQuizQuestion() {
   const qContainer = document.getElementById("quizContainer");
   if (!qContainer) return;
 
   if (AppState.currentQuizQuestions.length === 0) {
-    prepareRoleQuiz();
+    await prepareRoleQuiz();
   }
 
   const questions = AppState.currentQuizQuestions;
+
   const roleTitle = (AppState.roles[AppState.targetRole] || AppState.roles["JAVA_BACKEND"]).title;
 
   const subtitle = document.getElementById("quizRoleSubtitle");
@@ -434,6 +454,8 @@ document.addEventListener("click", async (e) => {
       );
 
       AppState.assessmentId = result.assessmentId;
+
+      saveAppState();
 
       // Identify skills verified by correct answers
       AppState.verifiedSkills = [
@@ -596,6 +618,14 @@ document.addEventListener("click", async (e) => {
 
       renderDashboardData(dashboardData);
 
+      // Load Personalized Roadmap
+      const roadmapData = await getPersonalizedRoadmap(
+        AppState.resumeId,
+        getSelectedRoleId()
+      );
+
+      console.log("Roadmap Data:", roadmapData);
+
     } catch (error) {
       console.error("Quiz submission error:", error);
       alert(error.message || "Quiz submission failed.");
@@ -613,9 +643,12 @@ document.addEventListener("click", async (e) => {
   if (target.id === "unlockStep4Btn") {
     unlockStep(4, "btnStep4");
     renderProjectsAndRoadmap();
-    alert("Step 4 (Targeted Roadmap) unlocked.");
+
     const step4Btn = document.getElementById("btnStep4");
-    if (step4Btn) step4Btn.click();
+
+    if (step4Btn) {
+      step4Btn.click();
+    }
   }
 });
 
@@ -670,65 +703,88 @@ function calculateFinalReadiness() {
 }
 
 // Role and projects
-function renderProjectsAndRoadmap() {
-  const roleTitle = (AppState.roles[AppState.targetRole] || AppState.roles["JAVA_BACKEND"]).title;
-  const projectGrid = document.getElementById("projectRecommendationsGrid");
+async function renderProjectsAndRoadmap() {
 
-  // 1. RENDER ROLE-SPECIFIC PROJECTS
-  if (projectGrid) {
-    projectGrid.innerHTML = "";
-    const allProjects = AppState.roleProjects[AppState.targetRole] || AppState.roleProjects["JAVA_BACKEND"];
+  // Load projects saved by the logged-in user
+  await renderSavedProjects();
 
-    // Filter projects that address the user's identified skill gaps
-    let recommended = allProjects.filter(p => p.targetSkills.some(s => AppState.skillGaps.includes(s)));
-    if (recommended.length === 0) recommended = allProjects; // Fallback to role default projects
+}
 
-    recommended.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "project-card";
-      const tags = p.targetSkills.map(s => `<span class="tag ${AppState.skillGaps.includes(s) ? 'gap' : 'verified'}">${s}</span>`).join(" ");
+// ========================================
+// RESTORE DASHBOARD SESSION AFTER REFRESH
+// ========================================
 
-      card.innerHTML = `
-        <div>
-          <strong>${p.title}</strong>
-          <div class="desc" style="margin-bottom: 5px;">${p.description}</div>
-          <div>${tags}</div>
-        </div>
-        <button class="btn btn-secondary" onclick="alert('Project added to your personalized roadmap!')">Add to Roadmap</button>
-      `;
-      projectGrid.appendChild(card);
-    });
-  }
+async function restoreDashboardSession() {
+  try {
+    // Restore selected career role
+    const roleSelector = document.getElementById("globalRoleSelect");
 
-  // Roadmap setter
-  const roadmapContainer = document.getElementById("roadmapTimelineContainer");
-  if (roadmapContainer) {
-    roadmapContainer.innerHTML = "";
+    if (roleSelector) {
+      roleSelector.value = AppState.targetRole;
+    }
 
-    const gaps = AppState.skillGaps;
-    const gapText = gaps.length > 0 ? gaps.join(", ") : "Advanced Best Practices";
+    // Stop if no resume has been uploaded previously
+    if (!AppState.resumeId) {
+      return;
+    }
 
-    // Dynamic 14-day timeline based on role and actual missing skills
-    const dynamicRoadmap = [
-      { day: "Day 01-02", title: `Fundamentals Setup: ${roleTitle}`, desc: `Set up environment & review core concepts for missing areas (${gapText}).` },
-      { day: "Day 03-05", title: `Targeted Practice on Missing Skills`, desc: `Complete guided coding exercises & syntax problems specifically for ${gapText}.` },
-      { day: "Day 06-09", title: `Capstone Implementation`, desc: `Build dynamic capstone project incorporating missing competencies: ${gapText}.` },
-      { day: "Day 10-12", title: `GitHub Portfolio & Documentation`, desc: `Push code repository, write detailed README.md, and optimize project docs.` },
-      { day: "Day 13-14", title: `Final Role Verification Audit`, desc: `Re-evaluate readiness metrics for ${roleTitle} technical interviews.` }
-    ];
+    // Restore extracted resume skills
+    const skillsResult = await getResumeSkills(AppState.resumeId);
 
-    dynamicRoadmap.forEach((item, index) => {
-      const row = document.createElement("div");
-      row.className = "roadmap-item";
-      row.innerHTML = `
-        <span class="day-tag">${item.day}</span>
-        <div style="flex: 1;">
-          <strong>${item.title}</strong>
-          <div class="desc" style="margin-bottom: 0;">${item.desc}</div>
-        </div>
-        <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;">
-      `;
-      roadmapContainer.appendChild(row);
-    });
+    AppState.extractedSkills = skillsResult.detectedSkills || [];
+
+    // Restore skill matching
+    matchResumeToRole();
+
+    // Restore quiz questions if the quiz has not been submitted
+    if (!AppState.assessmentId) {
+      await prepareRoleQuiz();
+      await renderQuizQuestion();
+    }
+
+    // Unlock Step 2
+    unlockStep(2, "btnStep2");
+
+    // Restore quiz results and dashboard
+    if (AppState.assessmentId) {
+
+      // Unlock Step 3
+      unlockStep(3, "btnStep3");
+
+      // Fetch and render dashboard data
+      const dashboardData = await getDashboardData(
+        AppState.resumeId,
+        getSelectedRoleId(),
+        AppState.assessmentId
+      );
+
+      renderDashboardData(dashboardData);
+    }
+
+    // Restore Step 4 if it was previously unlocked
+    if (AppState.currentCompletedStep >= 4) {
+      unlockStep(4, "btnStep4");
+      await renderProjectsAndRoadmap();
+    }
+
+    // Restore the last active tab
+    const savedTab = localStorage.getItem("careernex_active_tab");
+
+    if (savedTab) {
+      const savedTabButton = Array.from(
+        document.querySelectorAll(".step-btn")
+      ).find(btn => btn.getAttribute("data-tab") === savedTab);
+
+      // Restore only if the step is unlocked
+      if (savedTabButton && !savedTabButton.classList.contains("disabled")) {
+        savedTabButton.click();
+      }
+    }
+
+  } catch (error) {
+    console.error("Failed to restore dashboard session:", error);
+  } finally {
+    // Show workspace after session restoration
+    document.querySelector(".workspace")?.classList.remove("restoring");
   }
 }

@@ -17,8 +17,12 @@ public class CorsConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-            List.of("http://127.0.0.1:51610")
+        // Allow frontend on any localhost development port
+        configuration.setAllowedOriginPatterns(
+            List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            )
         );
 
         configuration.setAllowedMethods(
@@ -28,6 +32,8 @@ public class CorsConfig {
         configuration.setAllowedHeaders(
             List.of("Authorization", "Content-Type")
         );
+
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
             new UrlBasedCorsConfigurationSource();

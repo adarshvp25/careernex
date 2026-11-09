@@ -202,4 +202,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check for an existing session when the page loads
     restoreSession();
 
+
+    // Handle logout
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+
+            // Remove authentication token
+            logoutUser();
+
+            // Reset user-specific application state
+            resetAppState();
+
+            // Reload application and return to login screen
+            window.location.reload();
+        });
+    }
+
 });

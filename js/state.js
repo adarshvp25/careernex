@@ -201,3 +201,86 @@ const AppState = {
         ]
     }
 };
+
+
+// ========================================
+// CAREERNEX APP STATE PERSISTENCE
+// ========================================
+
+const APP_STATE_STORAGE_KEY = "careernex_app_state";
+
+// Save important workflow state
+function saveAppState() {
+
+    const stateToSave = {
+        currentCompletedStep: AppState.currentCompletedStep,
+        targetRole: AppState.targetRole,
+        resumeId: AppState.resumeId,
+        assessmentId: AppState.assessmentId
+    };
+
+    localStorage.setItem(
+        APP_STATE_STORAGE_KEY,
+        JSON.stringify(stateToSave)
+    );
+}
+
+// Restore workflow state after browser refresh
+function restoreAppState() {
+
+    const savedState = localStorage.getItem(
+        APP_STATE_STORAGE_KEY
+    );
+
+    if (!savedState) return;
+
+    try {
+
+        const parsedState = JSON.parse(savedState);
+
+        AppState.currentCompletedStep =
+            parsedState.currentCompletedStep ?? 1;
+
+        AppState.targetRole =
+            parsedState.targetRole ?? "JAVA_BACKEND";
+
+        AppState.resumeId =
+            parsedState.resumeId ?? null;
+
+        AppState.assessmentId =
+            parsedState.assessmentId ?? null;
+
+    } catch (error) {
+
+        console.error("Failed to restore application state:", error);
+
+        localStorage.removeItem(APP_STATE_STORAGE_KEY);
+    }
+}
+
+// Restore saved state when this file loads
+restoreAppState();
+
+// Reset user-specific application state during logout
+function resetAppState() {
+
+    AppState.currentCompletedStep = 1;
+    AppState.targetRole = "JAVA_BACKEND";
+
+    AppState.resumeId = null;
+    AppState.assessmentId = null;
+
+    AppState.extractedSkills = [];
+    AppState.verifiedSkills = [];
+    AppState.skillGaps = [];
+
+    AppState.quizAnswers = {};
+    AppState.currentQuizQuestions = [];
+    AppState.currentQuizIndex = 0;
+
+    AppState.readinessScore = 0;
+
+    // Clear persisted user-specific state
+    localStorage.removeItem(APP_STATE_STORAGE_KEY);
+    localStorage.removeItem("careernex_active_tab");
+}
