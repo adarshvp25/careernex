@@ -642,6 +642,10 @@ document.addEventListener("click", async (e) => {
 
   if (target.id === "unlockStep4Btn") {
     unlockStep(4, "btnStep4");
+
+    // Unlock Career Dashboard
+    unlockStep(5, "btnDashboard");
+
     renderProjectsAndRoadmap();
 
     const step4Btn = document.getElementById("btnStep4");
@@ -765,6 +769,11 @@ async function restoreDashboardSession() {
     if (AppState.currentCompletedStep >= 4) {
       unlockStep(4, "btnStep4");
       await renderProjectsAndRoadmap();
+    }
+
+    // Restore Career Dashboard if it was previously unlocked
+    if (AppState.currentCompletedStep >= 5) {
+      unlockStep(5, "btnDashboard");
     }
 
     // Restore the last active tab

@@ -19,6 +19,7 @@ async function getPersonalizedRoadmap(resumeId, roleId) {
 }
 
 
+
 // Render Personalized Learning Roadmap
 async function renderLearningRoadmap() {
 
@@ -26,17 +27,32 @@ async function renderLearningRoadmap() {
         "learningRoadmapContainer"
     );
 
+    const dashboardRoadmap =
+        document.getElementById("dashboardRoadmap");
+
     if (!container) return;
 
     const resumeId = AppState.resumeId;
     const roleId = getSelectedRoleId();
 
     if (!resumeId || !roleId) {
-        container.textContent = "Please complete your resume analysis first.";
+        container.textContent =
+            "Please complete your resume analysis first.";
+
+        if (dashboardRoadmap) {
+            dashboardRoadmap.textContent =
+                "Please complete your resume analysis first.";
+        }
+
         return;
     }
 
     container.textContent = "Loading your learning roadmap...";
+
+    if (dashboardRoadmap) {
+        dashboardRoadmap.textContent =
+            "Loading your learning roadmap...";
+    }
 
     try {
 
@@ -47,8 +63,16 @@ async function renderLearningRoadmap() {
         );
 
         if (!roadmap || roadmap.length === 0) {
-            container.textContent =
+
+            const emptyMessage =
                 "No additional learning tasks are required for your selected role.";
+
+            container.textContent = emptyMessage;
+
+            if (dashboardRoadmap) {
+                dashboardRoadmap.textContent = emptyMessage;
+            }
+
             return;
         }
 
@@ -66,9 +90,17 @@ async function renderLearningRoadmap() {
 
         container.innerHTML = "";
 
+        if (dashboardRoadmap) {
+            dashboardRoadmap.innerHTML = "";
+        }
+
         roadmap.forEach(step => {
 
             const status = progressMap.get(step.id) || "NOT_STARTED";
+
+            // --------------------------------
+            // STEP 4: Original Roadmap Card
+            // --------------------------------
 
             const card = document.createElement("div");
             card.className = "roadmap-item";
@@ -110,7 +142,66 @@ async function renderLearningRoadmap() {
 
             statusSelect.value = status;
 
+            // --------------------------------
+            // DASHBOARD: Roadmap Status
+            // --------------------------------
+
+            let dashboardStatus = null;
+
+            if (dashboardRoadmap) {
+
+                const dashboardCard =
+                    document.createElement("div");
+
+                dashboardCard.className = "roadmap-item";
+
+                const dashboardTitle =
+                    document.createElement("strong");
+
+                dashboardTitle.textContent =
+                    `${step.sequenceNumber}. ${step.skillName}`;
+
+                const dashboardObjective =
+                    document.createElement("p");
+
+                dashboardObjective.textContent =
+                    step.learningObjective;
+
+                const dashboardTask =
+                    document.createElement("p");
+
+                dashboardTask.textContent =
+                    `Practical Task: ${step.practicalTask}`;
+
+                const dashboardDuration =
+                    document.createElement("span");
+
+                dashboardDuration.className = "project-skill";
+
+                dashboardDuration.textContent =
+                    `Estimated time: ${step.estimatedDays} days`;
+
+                dashboardStatus =
+                    document.createElement("p");
+
+                dashboardStatus.textContent =
+                    `Status: ${status.replace("_", " ")}`;
+
+                dashboardCard.append(
+                    dashboardTitle,
+                    dashboardObjective,
+                    dashboardTask,
+                    dashboardDuration,
+                    dashboardStatus
+                );
+
+                dashboardRoadmap.appendChild(dashboardCard);
+            }
+
+            // Update roadmap progress
             statusSelect.addEventListener("change", async () => {
+
+                const previousStatus = status;
 
                 try {
 
@@ -131,7 +222,15 @@ async function renderLearningRoadmap() {
                         }
                     );
 
+                    if (dashboardStatus) {
+                        dashboardStatus.textContent =
+                            `Status: ${statusSelect.value.replace("_", " ")}`;
+                    }
+
                     await renderRoadmapProgressSummary();
+
+                    // Refresh the saved status
+                    await renderLearningRoadmap();
 
                 } catch (error) {
 
@@ -141,7 +240,8 @@ async function renderLearningRoadmap() {
                     );
 
                     alert(error.message);
-                    statusSelect.value = status;
+
+                    statusSelect.value = previousStatus;
 
                 } finally {
 
@@ -168,8 +268,14 @@ async function renderLearningRoadmap() {
 
         container.textContent =
             "Unable to load your learning roadmap.";
+
+        if (dashboardRoadmap) {
+            dashboardRoadmap.textContent =
+                "Unable to load your learning roadmap.";
+        }
     }
 }
+
 
 
 
@@ -268,6 +374,22 @@ async function renderRoadmapProgressSummary() {
             progressTrack,
             learningDays
         );
+
+        // Update Career Dashboard learning progress
+        const dashboardProgress =
+            document.getElementById("dashboardLearningProgress");
+
+        if (dashboardProgress) {
+            dashboardProgress.textContent =
+                `${summary.completionPercentage}%`;
+        }
+
+        const dashboardRoadmap =
+            document.getElementById("dashboardRoadmap");
+
+        if (dashboardRoadmap) {
+            dashboardRoadmap.innerHTML = container.innerHTML;
+        }
 
     } catch (error) {
 
@@ -396,6 +518,78 @@ function renderDashboardData(data) {
 
     // Display Learning Progress Summary
     renderRoadmapProgressSummary();
+
+    renderCareerDashboard(data);
+}
+
+// Render Career Dashboard Overview
+function renderCareerDashboard(data) {
+
+    // Target Career Role
+    document.getElementById("dashboardTargetRole").textContent =
+        data.roleName || "--";
+
+    // Career Readiness
+    document.getElementById("dashboardReadinessScore").textContent =
+        `${data.overallReadiness ?? 0}%`;
+
+    // Quiz Score
+    document.getElementById("dashboardQuizScore").textContent =
+        `${data.quizScore ?? 0}%`;
+
+    // Assessment Results
+    document.getElementById("dashboardCorrectAnswers").textContent =
+        document.getElementById("correctAnswers")?.textContent || "--";
+
+    document.getElementById("dashboardVerifiedSkills").textContent =
+        document.getElementById("verifiedSkillsCount")?.textContent || "--";
+
+
+    // Resume Skills
+    const resumeSkillsContainer =
+        document.getElementById("dashboardResumeSkills");
+
+    resumeSkillsContainer.innerHTML = "";
+
+    (AppState.extractedSkills || []).forEach(skill => {
+        const tag = document.createElement("span");
+        tag.className = "skill-tag";
+        tag.textContent = skill;
+        resumeSkillsContainer.appendChild(tag);
+    });
+
+
+    // Matched Skills
+    const matchedContainer =
+        document.getElementById("dashboardMatchedSkills");
+
+    matchedContainer.innerHTML = "";
+
+    (data.skillAnalysis.matchedSkills || []).forEach(skill => {
+        const tag = document.createElement("span");
+        tag.className = "skill-tag";
+        tag.textContent = skill;
+        matchedContainer.appendChild(tag);
+    });
+
+
+    // Missing Skills
+    const missingContainer =
+        document.getElementById("dashboardMissingSkills");
+
+    missingContainer.innerHTML = "";
+
+    const missingSkills = [
+        ...(data.skillAnalysis.missingMandatorySkills || []),
+        ...(data.skillAnalysis.missingOptionalSkills || [])
+    ];
+
+    missingSkills.forEach(skill => {
+        const tag = document.createElement("span");
+        tag.className = "skill-tag";
+        tag.textContent = skill;
+        missingContainer.appendChild(tag);
+    });
 }
 
 
@@ -407,11 +601,27 @@ async function renderProjectRecommendations(projects) {
         "projectRecommendationsGrid"
     );
 
+    const dashboardProjects =
+        document.getElementById("dashboardProjects");
+
+    // Clear existing content
     projectContainer.innerHTML = "";
 
+    if (dashboardProjects) {
+        dashboardProjects.innerHTML = "";
+    }
+
+    // Handle empty project recommendations
     if (!projects || projects.length === 0) {
+
         projectContainer.innerHTML =
             "<p>No project recommendations available.</p>";
+
+        if (dashboardProjects) {
+            dashboardProjects.textContent =
+                "No project recommendations available.";
+        }
+
         return;
     }
 
@@ -423,6 +633,10 @@ async function renderProjectRecommendations(projects) {
     );
 
     projects.forEach(project => {
+
+        // ---------------------------------
+        // STEP 4: Recommended Project Card
+        // ---------------------------------
 
         const projectCard = document.createElement("div");
         projectCard.className = "recommended-project-card";
@@ -445,7 +659,8 @@ async function renderProjectRecommendations(projects) {
         techStack.textContent = `Tech Stack: ${project.techStack}`;
 
         const outcome = document.createElement("p");
-        outcome.textContent = `Learning Outcome: ${project.learningOutcome}`;
+        outcome.textContent =
+            `Learning Outcome: ${project.learningOutcome}`;
 
         const addButton = document.createElement("button");
         addButton.className = "btn btn-secondary";
@@ -493,6 +708,35 @@ async function renderProjectRecommendations(projects) {
         );
 
         projectContainer.appendChild(projectCard);
+
+
+        // ---------------------------------
+        // CAREER DASHBOARD: Project Card
+        // ---------------------------------
+
+        if (dashboardProjects) {
+
+            const dashboardCard = document.createElement("div");
+            dashboardCard.className = "project-card";
+
+            const dashboardTitle = document.createElement("h3");
+            dashboardTitle.textContent = project.projectTitle;
+
+            const dashboardDescription = document.createElement("p");
+            dashboardDescription.textContent = project.description;
+
+            const dashboardSkill = document.createElement("span");
+            dashboardSkill.className = "project-skill";
+            dashboardSkill.textContent = project.skillName;
+
+            dashboardCard.append(
+                dashboardTitle,
+                dashboardDescription,
+                dashboardSkill
+            );
+
+            dashboardProjects.appendChild(dashboardCard);
+        }
     });
 }
 

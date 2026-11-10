@@ -1437,3 +1437,276 @@ textarea:focus {
   width: 20px;
   text-align: center;
 }
+
+
+/* ========================================
+   CAREERNEX - CAREER DASHBOARD
+======================================== */
+
+/* Dashboard section spacing */
+#tab-dashboard .panel {
+  padding: 28px;
+}
+
+#tab-dashboard h2 {
+  margin-bottom: 8px;
+}
+
+#tab-dashboard h3 {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+#tab-dashboard .desc {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+
+/* ========================================
+   DASHBOARD OVERVIEW
+======================================== */
+
+.dashboard-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.dashboard-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.dashboard-overview .dashboard-card {
+  min-height: 115px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-overview .dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+}
+
+.dashboard-card h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.dashboard-card strong {
+  font-size: 25px;
+  font-weight: 700;
+  color: #1e293b;
+  overflow-wrap: anywhere;
+}
+
+
+/* ========================================
+   SKILL SECTIONS
+======================================== */
+
+#dashboardResumeSkills,
+#dashboardMatchedSkills,
+#dashboardMissingSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 35px;
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 7px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Matched skills */
+#dashboardMatchedSkills .skill-tag {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+/* Missing skills */
+#dashboardMissingSkills .skill-tag {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #c2410c;
+}
+
+
+/* ========================================
+   ASSESSMENT RESULTS
+======================================== */
+
+#tab-dashboard .dashboard-card p {
+  margin: 10px 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+#tab-dashboard .dashboard-card p strong {
+  color: #1e293b;
+  font-size: 16px;
+}
+
+
+/* ========================================
+   LEARNING ROADMAP
+======================================== */
+
+#dashboardRoadmap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+#dashboardRoadmap .roadmap-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#dashboardRoadmap .roadmap-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+}
+
+#dashboardRoadmap .roadmap-item strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #1e293b;
+}
+
+#dashboardRoadmap .roadmap-item p {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+#dashboardRoadmap .roadmap-item .project-skill {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ========================================
+   RECOMMENDED PROJECTS
+======================================== */
+
+#dashboardProjects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+#dashboardProjects .project-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#dashboardProjects .project-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+#dashboardProjects .project-card h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1e293b;
+}
+
+#dashboardProjects .project-card p {
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+#dashboardProjects .project-skill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 1000px) {
+
+  .dashboard-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+
+  #tab-dashboard .panel {
+    padding: 18px;
+  }
+
+  #dashboardRoadmap,
+  #dashboardProjects {
+    grid-template-columns: 1fr;
+  }
+
+  #tab-dashboard h3 {
+    margin-top: 25px;
+  }
+}
+
+@media (max-width: 450px) {
+
+  .dashboard-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-overview .dashboard-card {
+    min-height: 95px;
+  }
+
+  .dashboard-card strong {
+    font-size: 22px;
+  }
+}

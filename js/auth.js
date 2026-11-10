@@ -45,6 +45,7 @@ async function loginUser(email, password) {
         });
 
         const result = await response.json();
+        console.log("Login response:", result);
 
         if (!response.ok) {
             throw new Error(result.message || "Login failed");
@@ -160,7 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             loginForm.reset();
 
+            // Restore the user's previous CareerNex session
+            await restoreDashboardSession();
+
         } catch (error) {
+            console.error("Login/session restoration error:", error);
             showAuthMessage(error.message, true);
         }
     });

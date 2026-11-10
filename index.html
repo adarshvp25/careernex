@@ -163,6 +163,13 @@
           <i class="fa-solid fa-lock lock-icn"></i>
         </button>
 
+        <!-- Career Dashboard -->
+        <button class="step-btn disabled" id="btnDashboard" data-tab="tab-dashboard" disabled>
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Career Dashboard</span>
+          <i class="fa-solid fa-lock lock-icn"></i>
+        </button>
+
         <div class="sidebar-bottom">
           <button type="button" class="sidebar-action-btn" id="logoutBtn">
             <i class="fa-solid fa-right-from-bracket"></i>
@@ -400,6 +407,67 @@
           </div>
         </section>
 
+        <!-- CAREER DASHBOARD -->
+        <section id="tab-dashboard" class="tab-pane">
+          <div class="panel">
+            <h2>Career Dashboard</h2>
+            <p class="desc">
+              Your career readiness, skill analysis, assessment results, and learning progress.
+            </p>
+
+            <!-- Overview -->
+            <div class="dashboard-overview">
+              <div class="dashboard-card">
+                <h4>Target Career Role</h4>
+                <strong id="dashboardTargetRole">--</strong>
+              </div>
+
+              <div class="dashboard-card">
+                <h4>Career Readiness</h4>
+                <strong id="dashboardReadinessScore">--</strong>
+              </div>
+
+              <div class="dashboard-card">
+                <h4>Quiz Score</h4>
+                <strong id="dashboardQuizScore">--</strong>
+              </div>
+
+              <div class="dashboard-card">
+                <h4>Learning Progress</h4>
+                <strong id="dashboardLearningProgress">--</strong>
+              </div>
+            </div>
+
+            <!-- Resume Skills -->
+            <h3>Resume Skills</h3>
+            <div id="dashboardResumeSkills" class="tag-cloud"></div>
+
+            <!-- Skill Analysis -->
+            <h3>Skill Analysis</h3>
+            <div class="dashboard-card">
+              <h4>Matched Skills</h4>
+              <div id="dashboardMatchedSkills" class="tag-cloud"></div>
+
+              <h4>Missing Skills</h4>
+              <div id="dashboardMissingSkills" class="tag-cloud"></div>
+            </div>
+
+            <!-- Assessment -->
+            <h3>Assessment Results</h3>
+            <div class="dashboard-card">
+              <p>Correct Answers: <strong id="dashboardCorrectAnswers">--</strong></p>
+              <p>Verified Skills: <strong id="dashboardVerifiedSkills">--</strong></p>
+            </div>
+
+            <!-- Learning Roadmap -->
+            <h3>Learning Roadmap</h3>
+            <div id="dashboardRoadmap"></div>
+
+            <!-- Recommended Projects -->
+            <h3>Recommended Projects</h3>
+            <div id="dashboardProjects" class="project-list"></div>
+          </div>
+        </section>
     </div>
     </main>
 
